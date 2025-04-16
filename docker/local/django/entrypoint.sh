@@ -19,7 +19,7 @@ while True:
       user="${POSTGRES_USER}",
       password="${POSTGRES_PASSWORD}",
       host="${POSTGRES_HOST}",
-      port="${POSTGRES_PORT}",
+      port="${POSTGRES_PORT}", 
     )
     break
   except psycopg2.OperationalError as error:

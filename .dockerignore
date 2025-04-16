@@ -7,4 +7,4 @@ venv/
 .venv/
 *.log
 staticfiles/
-.envs/*
+.env/*
