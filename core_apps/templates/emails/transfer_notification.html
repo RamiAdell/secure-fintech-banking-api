@@ -1,0 +1,33 @@
+{% extends "emails/base.html" %}
+{% load humanize %}
+
+{% block title %}
+	Transfer Notification
+{% endblock %}
+
+{% block content %}
+    <h2>Transfer Confirmation</h2>
+    <p>Dear {{ user }},</p>
+    {% if is_sender %}
+        <p>We are writing to confirm that you have successfully sent a transfer.</p>
+    {% else %}
+        <p>We are writing to inform you that you have received a transfer.</p>
+    {% endif %}
+    <p>Details of the transaction:</p>
+    <ul>
+        <li><strong>Amount:</strong> {{ currency }} {{ amount|intcomma }}</li>
+        {% if is_sender %}
+            <li> <strong>To: </strong> {{ receiver_name }} (Account: {{ receiver_account_number }})
+            </li>
+        {% else %}
+            <li> <strong>From: </strong> {{ sender_name }} (Account:
+                {{ sender_account_number }})
+            </li>
+        {% endif %}
+        <li><strong>Your New Balance:</strong> {{ currency }} {{ new_balance|intcomma }}</li>
+    </ul>
+    <p>If you are not aware of this transaction of have any questions, please contact our
+        customer support immediately</p>
+    <p>Thank you for banking with {{ site_name }}</p>
+    <p>Best Regards, <br>{{ site_name }} Team</p>
+{% endblock %}

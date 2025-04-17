@@ -1,0 +1,22 @@
+{% extends "emails/base.html" %}
+{% load humanize %}
+
+{% block title %}
+	Deposit Confirmation
+{% endblock %}
+
+{% block content %}
+	<h2>Deposit Confirmation</h2>
+    <p>Dear {{ user.full_name }},</p>
+    <p>We are pleased to inform you that a deposit has been made to your account.</p>
+    <p>Details of the transaction: </p>
+    <ul>
+        <li><strong>Amount:</strong> {{ currency }} {{ amount|intcomma }}</li>
+        <li><strong>Account Number:</strong> {{ account_number }} </li>
+        <li><strong>New Balance:</strong> {{ currency }} {{ new_balance|intcomma }}</li>
+    </ul>
+    <p>If you did not authorize this transaction or have any questions, please contact our
+        customer support immediately</p>
+    <p>Thank you for banking with {{ site_name  }}</p>
+    <p>Best regards, <br>{{ site_name }} Team</p>
+{% endblock %}

@@ -1,0 +1,29 @@
+{% extends "emails/base.html" %}
+
+{% block title %}
+	Account Created
+{% endblock %}
+
+{% block content %}
+    <h2>Welcome to {{ site_name }}</h2>
+    <p>Dear {{ user.full_name }},</p>
+    <p>We're excited to inform you that your new bank account has been created successfully.</p>
+    <p>Here are your account details:</p>
+    <ul>
+        <li><strong>Username:</strong> {{ user.username }}</li>
+        <li><strong>Your security question:</strong> {{ user.security_question }}</li>
+        <li><strong>Your security answer:</strong> {{ user.security_answer }}</li>
+        <li><strong>Account Number:</strong> {{ account.account_number }}</li>
+        <li><strong>Account Type:</strong> {{ account.get_account_type_display }}</li>
+        <li><strong>Currency:</strong> {{ account.get_currency_display }}</li>
+
+    </ul>
+
+    <p><strong>Important:</strong>To fully activate your account, please visit your nearest bank
+        branch with your {{ user.profile.get_means_of_identification_display }} and a valid ID
+        document for verification
+    </p>
+    <p>If you have any questions, please don't hesitate to contact our customer support</p>
+    <p>Thank your for choosing <strong>{{ site_name }}</strong></p>
+    <p>Best regards,<br>The {{ site_name }} Team</p>
+{% endblock %}
