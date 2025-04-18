@@ -45,35 +45,35 @@ A complete **Banking & FinTech API** built with Django REST Framework and Docker
 
 ### 1. Clone the Repository
 
-bash  
+```bash  
    git clone https://github.com/your-username/banking-fintech-api.git  
    cd banking-fintech-api
-
+```
 ### 2. Copy and configure environment variables
 
-bash  
+```bash  
    cp .env.example .env
-
+```
 Edit `.env` and fill in your secrets, DB config, email backend, etc.
 
 ### 3. Build and run local containers
 
-bash  
+```bash  
    docker compose -f local.yml up --build
-
+```
 ### 4. Run migrations & create superuser
 
-bash  
+```bash  
    docker compose -f local.yml run --rm api python manage.py migrate  
    docker compose -f local.yml run --rm api python manage.py createsuperuser
-
+```
 ---
 
 ## 🧪 Running Tests
 
-bash  
+```bash  
    docker compose -f local.yml run --rm api pytest
-
+```
 ---
 
 ## 🌱 Environment Structure
@@ -81,13 +81,42 @@ bash
 ```
 banking-fintech-api/
 │
-├── api/                  # Django backend core
-├── nginx/                # NGINX reverse proxy config
-├── scripts/              # Backup scripts and automation
-├── .env.example          # Environment template
-├── docker-compose.yml    # Docker orchestration
-├── manage.py
-└── README.md
+├── .env/
+│   └── .env.example
+│
+├── local.yml
+│
+├── backups/
+│
+├── config/
+│   └── settings/
+│       ├── base.py
+│       ├── local.py
+│       └── production.py
+│
+├── core_apps/
+│   ├── user_auth/
+│   ├── user_profile/
+│   └── ... other Django apps ...
+│
+├── docker/
+│   ├── local/
+│   │   ├── django/
+│   │   │   ├── Dockerfile
+│   │   │   ├── entrypoint.sh
+│   │   │   ├── start.sh
+│   │   │   └── celery/
+│   │   │       ├── worker.sh
+│   │   │       └── beat.sh
+│   │   ├── nginx/
+│   │   │   ├── Dockerfile
+│   │   │   └── nginx.conf
+│   │   └── postgres/
+│   │       ├── Dockerfile
+│   │       └── maintenance/
+│   │           └── ... backup scripts ...
+│   └── production/
+│       └── ... production configs ...
 ```
 
 ---
@@ -96,9 +125,9 @@ banking-fintech-api/
 
 ### Start Celery Worker
 
-bash  
+```bash  
    docker compose -f local.yml run --rm api celery -A core worker -l info
-
+```
 ### Start Flower Monitoring
 
 Flower runs at:  
