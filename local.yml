@@ -8,8 +8,8 @@ services:
             - .:/app:z
             - ./staticfiles:/app/staticfiles
 
-        ports:
-           - "8000:8000"
+        # ports:
+        #    - "8000:8000"
 
         expose:
             - "8000"
@@ -55,6 +55,22 @@ services:
         networks:
             - banker_local_nw
 
+
+    nginx:
+        build:
+            context: ./docker/local/nginx
+            dockerfile: Dockerfile
+        restart: always
+        ports:
+            - "8080:80"
+        volumes:
+            - ./staticfiles:/app/staticfiles
+            - logs_store:/var/log/nginx
+        depends_on:
+            - api
+        networks:
+            - banker_local_nw
+
 networks:
     banker_local_nw:
         external: true
@@ -62,6 +78,7 @@ networks:
 volumes:
     banker_local_db:
     banker_mailpit_db:
+    logs_store:
 
 
 
