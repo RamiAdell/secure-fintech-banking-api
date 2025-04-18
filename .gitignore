@@ -9,7 +9,8 @@ __pycache__/
 *$py.class
 
 staticfiles/
-.envs/*!.envs/.env.example
+.envs/*
+!.envs/.env.example
 # C extensions
 *.so
 
