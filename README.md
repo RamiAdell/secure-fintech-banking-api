@@ -67,13 +67,7 @@ Edit `.env` and fill in your secrets, DB config, email backend, etc.
    docker compose -f local.yml run --rm api python manage.py migrate  
    docker compose -f local.yml run --rm api python manage.py createsuperuser
 ```
----
 
-## 🧪 Running Tests
-
-```bash  
-   docker compose -f local.yml run --rm api pytest
-```
 ---
 
 ## 🌱 Environment Structure
@@ -130,7 +124,7 @@ banking-fintech-api/
 ```
 ### Start Flower Monitoring
 
-Flower runs at:  
+# Flower runs at:  
 http://localhost:5555
 
 ---
@@ -141,9 +135,9 @@ http://localhost:5555
 2. Configure NGINX with SSL via Let's Encrypt  
 3. Run the stack using production compose:
 
-bash  
+```bash  
    docker compose -f production.yml up -d --build
-
+```
 ---
 
 ## 📥 PostgreSQL Backup Script
@@ -155,14 +149,14 @@ Add to cron to run daily or weekly.
 
 ## 🔧 Makefile Shortcuts
 
-bash  
+```bash  
    make build  
    make up  
    make down  
    make migrate  
    make createsuperuser  
    make test
-
+```
 ---
 
 ## 📡 NGINX Setup
@@ -172,18 +166,3 @@ NGINX acts as:
 - Reverse proxy to Django app
 - Static/media files handler
 
----
-
-## 🧠 Author
-
-Made with ❤️ by **Rami Adel**  
-📍 Mohandessin, Egypt  
-🎓 CS Graduate - Arab Open University  
-💼 DevOps | Backend | AI Developer  
-🌐 [nexmediaai.com](https://nexmediaai.com)
-
----
-
-## 📄 License
-
-MIT License
