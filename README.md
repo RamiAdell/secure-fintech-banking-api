@@ -4,20 +4,20 @@ A complete **Banking & FinTech API** built with Django REST Framework and Docker
 
 ---
 
-## 🧠 What You Will Learn
+## 🧠 Topics Covered in This Project
 
-- ✅ How to use **Docker** with Django, PostgreSQL, Redis, RabbitMQ  
-- ✅ Set up **Celery** with **RabbitMQ** or **Redis** for background tasks  
-- ✅ Monitor Celery workers with **Flower**  
-- ✅ Serve static and media files via **NGINX**  
-- ✅ Secure your API using **HTTPS (SSL Certificates)** with Let's Encrypt  
-- ✅ Handle **reverse proxy** and **load balancing** with NGINX  
-- ✅ Use **Portainer** for managing Docker containers in production  
-- ✅ Backup PostgreSQL using automated **shell scripts**  
-- ✅ Host Django apps under a **custom domain on Ubuntu server**  
-- ✅ Build reusable commands using **Makefiles**  
-- ✅ Implement logging using **Loguru**  
-- ✅ Automate and monitor everything with **Bash scripts**
+- ✅ Used **Docker** with Django, PostgreSQL, Redis, and RabbitMQ  
+- ✅ Set up **Celery** with **RabbitMQ** and **Redis** for background tasks  
+- ✅ Integrated **Flower** to monitor Celery workers  
+- ✅ Served static and media files via **NGINX**  
+- ✅ Secured the API using **HTTPS (SSL Certificates)** with Let's Encrypt  
+- ✅ Configured **reverse proxy** and **load balancing** using NGINX  
+- ✅ Managed Docker containers in production using **Portainer**  
+- ✅ Backed up PostgreSQL using automated **shell scripts**  
+- ✅ Deployed the Django app on an **Ubuntu server with a custom domain**  
+- ✅ Built reusable Docker-related commands using **Makefiles**  
+- ✅ Implemented centralized logging with **Loguru**  
+- ✅ Automated and monitored services using **Bash scripts**
 
 ---
 
@@ -124,7 +124,7 @@ banking-fintech-api/
 ```
 ### Start Flower Monitoring
 
-# Flower runs at:  
+### Flower runs at:  
 http://localhost:5555
 
 ---
