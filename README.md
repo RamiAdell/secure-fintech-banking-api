@@ -6,17 +6,17 @@ A complete **Banking & FinTech API** built with Django REST Framework and Docker
 
 ## 🧠 Topics Covered in This Project
 
-- ✅ Used **Docker** with Django, PostgreSQL, Redis, and RabbitMQ  
-- ✅ Set up **Celery** with **RabbitMQ** and **Redis** for background tasks  
-- ✅ Integrated **Flower** to monitor Celery workers  
-- ✅ Served static and media files via **NGINX**  
-- ✅ Secured the API using **HTTPS (SSL Certificates)** with Let's Encrypt  
-- ✅ Configured **reverse proxy** and **load balancing** using NGINX  
-- ✅ Managed Docker containers in production using **Portainer**  
-- ✅ Backed up PostgreSQL using automated **shell scripts**  
-- ✅ Deployed the Django app on an **Ubuntu server with a custom domain**  
-- ✅ Built reusable Docker-related commands using **Makefiles**  
-- ✅ Implemented centralized logging with **Loguru**  
+- ✅ Used **Docker** with Django, PostgreSQL, Redis, and RabbitMQ
+- ✅ Set up **Celery** with **RabbitMQ** and **Redis** for background tasks
+- ✅ Integrated **Flower** to monitor Celery workers
+- ✅ Served static and media files via **NGINX**
+- ✅ Secured the API using **HTTPS (SSL Certificates)** with Let's Encrypt
+- ✅ Configured **reverse proxy** and **load balancing** using NGINX
+- ✅ Managed Docker containers in production using **Portainer**
+- ✅ Backed up PostgreSQL using automated **shell scripts**
+- ✅ Deployed the Django app on an **Ubuntu server with a custom domain**
+- ✅ Built reusable Docker-related commands using **Makefiles**
+- ✅ Implemented centralized logging with **Loguru**
 - ✅ Automated and monitored services using **Bash scripts**
 
 ---
@@ -45,26 +45,26 @@ A complete **Banking & FinTech API** built with Django REST Framework and Docker
 
 ### 1. Clone the Repository
 
-```bash  
-   git clone https://github.com/your-username/banking-fintech-api.git  
+```bash
+   git clone https://github.com/your-username/banking-fintech-api.git
    cd banking-fintech-api
 ```
 ### 2. Copy and configure environment variables
 
-```bash  
+```bash
    cp .env.example .env
 ```
 Edit `.env` and fill in your secrets, DB config, email backend, etc.
 
 ### 3. Build and run local containers
 
-```bash  
+```bash
    docker compose -f local.yml up --build
 ```
 ### 4. Run migrations & create superuser
 
-```bash  
-   docker compose -f local.yml run --rm api python manage.py migrate  
+```bash
+   docker compose -f local.yml run --rm api python manage.py migrate
    docker compose -f local.yml run --rm api python manage.py createsuperuser
 ```
 
@@ -119,42 +119,42 @@ banking-fintech-api/
 
 ### Start Celery Worker
 
-```bash  
+```bash
    docker compose -f local.yml run --rm api celery -A core worker -l info
 ```
 ### Start Flower Monitoring
 
-### Flower runs at:  
+### Flower runs at:
 http://localhost:5555
 
 ---
 
 ## 🔐 Production Deployment
 
-1. Point your domain (e.g., `api.mybank.com`) to the server IP  
-2. Configure NGINX with SSL via Let's Encrypt  
+1. Point your domain (e.g., `api.mybank.com`) to the server IP
+2. Configure NGINX with SSL via Let's Encrypt
 3. Run the stack using production compose:
 
-```bash  
+```bash
    docker compose -f production.yml up -d --build
 ```
 ---
 
 ## 📥 PostgreSQL Backup Script
 
-Shell script in `scripts/backup_postgres.sh` for scheduled backups.  
+Shell script in `scripts/backup_postgres.sh` for scheduled backups.
 Add to cron to run daily or weekly.
 
 ---
 
 ## 🔧 Makefile Shortcuts
 
-```bash  
-   make build  
-   make up  
-   make down  
-   make migrate  
-   make createsuperuser  
+```bash
+   make build
+   make up
+   make down
+   make migrate
+   make createsuperuser
    make test
 ```
 ---
@@ -165,4 +165,3 @@ NGINX acts as:
 - SSL terminator
 - Reverse proxy to Django app
 - Static/media files handler
-
