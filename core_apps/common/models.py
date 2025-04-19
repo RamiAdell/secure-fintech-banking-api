@@ -24,7 +24,7 @@ class ContentView(TimeStampedModel):
     object_id = models.UUIDField(verbose_name=_("Object ID"))
     content_object = GenericForeignKey("content_type", "object_id")
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="content_views", verbose_name=_("User"))
-    viewer_ip = models.GenericIPAddressField( erbose_name=_("Viewer IP Address"), null=True, blank=True, )
+    viewer_ip = models.GenericIPAddressField(verbose_name=_("Viewer IP Address"), null=True, blank=True, )
     last_viewed = models.DateTimeField()
 
     class Meta:
