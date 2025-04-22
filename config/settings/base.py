@@ -162,6 +162,15 @@ cloudinary.config(
     api_secret=CLOUDINARY_API_SECRET,
 )
 
+
+COOKIE_NAME="access"
+COOKIE_SAME_SITE="Lax"
+COOKIE_PATH="/"
+COOKIE_HTTP_ONLY=True
+COOKIE_SECURE=getenv("COOKIE_SECURE", "True") == True
+
+
+
 AUTH_USER_MODEL = "user_auth.USER"
 DEFAULT_BIRTH_DATE = date(1900,1,1)
 DEFAULT_DATE = date(2000,1,1)
