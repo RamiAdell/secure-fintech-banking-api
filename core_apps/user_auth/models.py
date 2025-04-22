@@ -10,6 +10,12 @@ from .managers import UserManager
 
 
 class User(AbstractUser):
+
+    class Meta:
+        verbose_name = _("User")
+        verbose_name_plural = _("Users")
+        ordering = ["-date_joined"]
+
     class SecurityQuestions(models.TextChoices):
         MAIDEN_NAME = (
             "maiden_name",
@@ -129,11 +135,6 @@ class User(AbstractUser):
     def full_name(self) -> str:
         full_name = f"{self.first_name} {self.last_name}"
         return full_name.title().strip()
-
-    class Meta:
-        verbose_name = _("User")
-        verbose_name_plural = _("Users")
-        ordering = ["-date_joined"]
 
     def has_role(self, role_name: str) -> bool:
         return hasattr(self, "role") and self.role == role_name
