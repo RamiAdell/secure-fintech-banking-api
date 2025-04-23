@@ -21,7 +21,7 @@ class ProfileAdminForm(forms.ModelForm):
 class NextOfKinInline(admin.TabularInline):
     model = NextOfKin
     extra = 1
-    fields = ["first_name", "last_name", "relationship", "phone_number", "is_primary"]
+    fields = ["first_name", "last_name", "title", "date_of_birth", "gender", "email_address", "address", "city", "country", "relationship", "phone_number", "is_primary"]
 
 
 @admin.register(Profile)
