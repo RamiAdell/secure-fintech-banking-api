@@ -24,8 +24,8 @@ def set_auth_cookies(response: Response, access_token: str, refresh_token: Optio
     cookie_settings = {
         "path": settings.COOKIE_PATH,
         "secure": settings.COOKIE_SECURE,
-        "httponly": settings.COOKIE_HTTPONLY,
-        "samesite": settings.COOKIE_SAMESITE,
+        "httponly": settings.COOKIE_HTTP_ONLY,
+        "samesite": settings.COOKIE_SAME_SITE,
         "max_age": access_token_lifetime,
     }
     response.set_cookie("access", access_token, **cookie_settings)
