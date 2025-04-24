@@ -40,11 +40,14 @@ THIRD_PARTY_APPS = [
     "django_filters",
     "djcelery_email",
     "django_celery_beat",
+    'rest_framework_simplejwt',
+    'rest_framework_simplejwt.token_blacklist',
 ]
 
 LOCAL_APPS = ["core_apps.user_auth",
               "core_apps.common",
               "core_apps.user_profile",
+
 ]
 
 
@@ -200,11 +203,13 @@ REST_FRAMEWORK = {
         "user": "100/day",
     },
 }
+
 SIMPLE_JWT = {
     "SIGNING_KEY": getenv("SIGNING_KEY"),
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=1),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
     "ROTATE_REFRESH_TOKENS": True,
+    "BLACKLIST_AFTER_ROTATION": True,  # Add this line
     "USER_ID_FIELD": "id",
     "USER_ID_CLAIM": "user_id",
 }
