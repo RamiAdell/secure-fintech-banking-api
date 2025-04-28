@@ -41,9 +41,7 @@ class NextOfKinSerializer(serializers.ModelSerializer):
 class ProfileSerializer(serializers.ModelSerializer):
     id = UUIDField(read_only=True)
     first_name = serializers.CharField(source="user.first_name")
-    middle_name = serializers.CharField(
-        source="user.middle_name", required=False, allow_blank=True
-    )
+    middle_name = serializers.CharField(source="user.middle_name", required=False, allow_blank=True)
     last_name = serializers.CharField(source="user.last_name")
     username = serializers.ReadOnlyField(source="user.username")
     email = serializers.EmailField(source="user.email", read_only=True)
