@@ -20,8 +20,8 @@ from utils.auth_helper import generate_otp
 User = get_user_model()
 
 
-class CustomTokenCreateView(TokenCreateView):
-    def _action(self, serializer):
+class CustomTokenCreateView(TokenCreateView): # creation activation account view
+    def _action(self, serializer): # Think of _action() as the “what to do if login is successful” handler.
         user = serializer.user
         if user.is_locked_out:
             return locked_out_response()
@@ -96,7 +96,7 @@ class CustomTokenRefreshView(TokenRefreshView):
         return refresh_res
 
 
-class OTPVerifyView(APIView):
+class OTPVerifyView(APIView): ## Login OTP verification view 2FA
     permission_classes = [permissions.AllowAny]
 
     def post(self, request):
