@@ -126,6 +126,8 @@ class Profile(TimeStampedModel):
             self.photo,
             self.id_photo,
             self.signature_photo,
+            self.account_currency,
+            self.account_type,
         ]
 
         return all(required_fields) and self.next_of_kin.exists()

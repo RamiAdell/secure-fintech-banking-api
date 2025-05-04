@@ -11,10 +11,10 @@ from rest_framework.request import Request
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenRefreshView
-from cookie_manager import set_auth_cookies
+from .cookie_manager import set_auth_cookies
 from .emails import send_otp_email
-from utils.responses import *
-from utils.auth_helper import generate_otp
+from .utils.responses import *
+from .utils.auth_helper import generate_otp
 
 
 User = get_user_model()

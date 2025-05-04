@@ -2,9 +2,9 @@ import secrets
 from os import getenv
 from typing import Union, List
 from django.db import transaction
-from emails import send_account_creation_email
+from ..emails import send_account_creation_email
 
-from models import BankAccount
+from core_apps.accounts.models import BankAccount
 
 
 def generate_account_number(currency: str) -> str:
