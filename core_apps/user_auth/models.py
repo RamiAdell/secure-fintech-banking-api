@@ -131,10 +131,18 @@ class User(AbstractUser):
             return True
         return False
 
+
     @property
     def full_name(self) -> str:
         full_name = f"{self.first_name} {self.last_name}"
         return full_name.title().strip()
+    
+    @property
+    def is_not_active(self) -> bool:
+        if self.active == True:
+            return False
+        else:
+            return True
 
     def has_role(self, role_name: str) -> bool:
         return hasattr(self, "role") and self.role == role_name

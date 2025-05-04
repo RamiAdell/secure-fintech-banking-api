@@ -52,6 +52,7 @@ class CustomTokenCreateView(TokenCreateView):
                 },
                 status=status.HTTP_403_FORBIDDEN,
             )
+        
         user.reset_failed_login_attempts()
 
         otp = generate_otp()
@@ -77,15 +78,23 @@ class CustomTokenCreateView(TokenCreateView):
             email = request.data.get("email")
             user = User.objects.filter(email=email).first()
             if user:
+                if not user.is_active:
+                    return Response(
+                        {
+                            "error": "Please check your email and activate"
+                        },
+                        status=status.HTTP_403_FORBIDDEN,
+                )
                 user.handle_failed_login_attempts()
                 failed_attempts = user.failed_login_attempts
                 logger.error(
                     f"Failed login attempts: {failed_attempts}  for user: {email}"
                 )
+
                 if failed_attempts >= settings.LOGIN_ATTEMPTS:
                     return Response(
                         {
-                            "error": f"You have exceeded the maximum number of login attempts. "
+                            "error": f"You have exceeded the maximum number of login attempts.sca "
                             f"Your account has been locked for "
                             f"{settings.LOCKOUT_DURATION.total_seconds() / 60} minutes. "
                             f"An email has been sent to you with further instructions",
