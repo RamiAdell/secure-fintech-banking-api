@@ -4,7 +4,7 @@ from os import getenv
 from typing import Any, Optional
 
 from django.contrib.auth.hashers import make_password
-from django.contrib.auth.models import UserManager as DjangoUserManager
+from django.contrib.auth.models import UserManager as DjUserManager
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
 from django.utils.translation import gettext_lazy as _
@@ -29,7 +29,7 @@ def validate_email_address(email: str) -> None:
         raise ValidationError(_("Enter a valid email address."))
 
 
-class UserManager(DjangoUserManager):
+class UserManager(DjUserManager):
     def _create_user(self, email: str, password: str, **extra_fields: Any):
         if not email:
             raise ValueError(_("An email address must be provided."))
