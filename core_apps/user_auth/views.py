@@ -13,24 +13,18 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenRefreshView
 from cookie_manager import set_auth_cookies
 from .emails import send_otp_email
-from .utils import generate_otp
+from utils.responses import *
+from utils.auth_helper import generate_otp
+
 
 User = get_user_model()
-
-
 
 
 class CustomTokenCreateView(TokenCreateView):
     def _action(self, serializer):
         user = serializer.user
         if user.is_locked_out:
-            return Response(
-                {
-                    "error": f"Account is locked due to multiple failed login attempts. Please "
-                    f"try again after {settings.LOCKOUT_DURATION.total_seconds() / 60} minutes. ",
-                },
-                status=status.HTTP_403_FORBIDDEN,
-            )
+            return locked_out_response()
         
         user.reset_failed_login_attempts()
 
@@ -40,13 +34,7 @@ class CustomTokenCreateView(TokenCreateView):
 
         logger.info(f"OTP sent for login to user: {user.email}")
 
-        return Response(
-            {
-                "success": "OTP sent to your email",
-                "email": user.email,
-            },
-            status=status.HTTP_200_OK,
-        )
+        return otp_sent_response(user.email)
 
     def post(self, request: Request, *args: Any, **kwargs: Any) -> Response:
         serializer = self.get_serializer(data=request.data)
@@ -58,12 +46,8 @@ class CustomTokenCreateView(TokenCreateView):
             user = User.objects.filter(email=email).first()
             if user:
                 if not user.is_active:
-                    return Response(
-                        {
-                            "error": "Please check your email and activate"
-                        },
-                        status=status.HTTP_403_FORBIDDEN,
-                )
+                    return account_inactive_response()
+
                 user.handle_failed_login_attempts()
                 failed_attempts = user.failed_login_attempts
                 logger.error(
@@ -71,22 +55,12 @@ class CustomTokenCreateView(TokenCreateView):
                 )
 
                 if failed_attempts >= settings.LOGIN_ATTEMPTS:
-                    return Response(
-                        {
-                            "error": f"You have exceeded the maximum number of login attempts.sca "
-                            f"Your account has been locked for "
-                            f"{settings.LOCKOUT_DURATION.total_seconds() / 60} minutes. "
-                            f"An email has been sent to you with further instructions",
-                        },
-                        status=status.HTTP_403_FORBIDDEN,
-                    )
+                    return exceeded_login_attempts_response()
             else:
                 logger.error(f"Failed login attempt for non-existent user: {email}")
 
-            return Response(
-                {"error": "Your Login Credentials are not correct"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+            return invalid_credentials_response()
+
         return self._action(serializer)
 
 
@@ -116,12 +90,8 @@ class CustomTokenRefreshView(TokenRefreshView):
                 refresh_res.data["message"] = "Access tokens refreshed successfully."
 
             else:
-                refresh_res.data["message"] = (
-                    "Access or refresh token not found in refresh response data"
-                )
-                logger.error(
-                    "Access or refresh token not found in refresh response data"
-                )
+                refresh_res.data["message"] = ("Access or refresh token not found in refresh response data")
+                logger.error("Access or refresh token not found in refresh response data")
 
         return refresh_res
 
@@ -133,27 +103,15 @@ class OTPVerifyView(APIView):
         otp = request.data.get("otp")
 
         if not otp:
-            return Response(
-                {"error": "OTP is required"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+            return otp_missing_response()
+
         user = User.objects.filter(otp=otp, otp_expiry_time__gt=timezone.now()).first()
 
         if not user:
-            return Response(
-                {"error": "Invalid or expired OTP"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+            return otp_invalid_response()
 
         if user.is_locked_out:
-            return Response(
-                {
-                    "error": f"Account is locked due to multiple failed login attempts. "
-                    f"Please try again after "
-                    f"{settings.LOCKOUT_DURATION.total_seconds() / 60} minutes "
-                },
-                status=status.HTTP_403_FORBIDDEN,
-            )
+            return locked_out_response()
 
         user.verify_otp(otp)
 
@@ -161,13 +119,7 @@ class OTPVerifyView(APIView):
         access_token = str(refresh.access_token)
         refresh_token = str(refresh)
 
-        response = Response(
-            {
-                "success": "Login successful. Now add your profile information, "
-                "so that we can create an account for you"
-            },
-            status=status.HTTP_200_OK,
-        )
+        response = otp_successful_login_response()
         set_auth_cookies(response, access_token, refresh_token)
         logger.info(f"Successful login with OTP: {user.email}")
         return response
