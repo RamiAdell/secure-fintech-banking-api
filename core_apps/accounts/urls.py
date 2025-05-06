@@ -5,9 +5,6 @@ from .views import (
 
 urlpatterns = [
     path(
-        "verify/<uuid:pk>/",
-        AccountVerificationView.as_view(),
-        name="account_verification",
-    ),
+        "verify/<uuid:pk>/", AccountVerificationView.as_view(), name="account_verification",),
     
     ]

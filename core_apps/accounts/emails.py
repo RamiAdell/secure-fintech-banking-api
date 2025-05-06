@@ -43,31 +43,29 @@ def send_full_activation_email(account: BankAccount) -> None:
         )
 
 
-# def send_deposit_email(
-#     user, user_email, amount, currency, new_balance, account_number
-# ) -> None:
-#     subject = _("Deposit Confirmation")
-#     from_email = settings.DEFAULT_FROM_EMAIL
-#     recipient_list = [user_email]
-#     context = {
-#         "user": user,
-#         "amount": amount,
-#         "currency": currency,
-#         "new_balance": new_balance,
-#         "account_number": account_number,
-#         "site_name": settings.SITE_NAME,
-#     }
-#     html_email = render_to_string("emails/deposit_confirmation.html", context)
-#     plain_email = strip_tags(html_email)
-#     email = EmailMultiAlternatives(subject, plain_email, from_email, recipient_list)
-#     email.attach_alternative(html_email, "text/html")
-#     try:
-#         email.send()
-#         logger.info(f"Deposit Confirmation email sent to: {user_email}")
-#     except Exception as e:
-#         logger.error(
-#             f"Failed to send deposit confirmation email to  {user_email}. Error: {str(e)}"
-#         )
+def send_deposit_email(user, user_email, amount, currency, new_balance, account_number) -> None:
+    subject = _("Deposit Confirmation")
+    from_email = settings.DEFAULT_FROM_EMAIL
+    recipient_list = [user_email]
+    context = {
+        "user": user,
+        "amount": amount,
+        "currency": currency,
+        "new_balance": new_balance,
+        "account_number": account_number,
+        "site_name": settings.SITE_NAME,
+    }
+    html_email = render_to_string("emails/deposit_confirmation.html", context)
+    plain_email = strip_tags(html_email)
+    email = EmailMultiAlternatives(subject, plain_email, from_email, recipient_list)
+    email.attach_alternative(html_email, "text/html")
+    try:
+        email.send()
+        logger.info(f"Deposit Confirmation email sent to: {user_email}")
+    except Exception as e:
+        logger.error(
+            f"Failed to send deposit confirmation email to  {user_email}. Error: {str(e)}"
+        )
 
 
 # def send_withdrawal_email(
