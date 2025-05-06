@@ -39,7 +39,7 @@ class VirtualCardListCreateAPIView(generics.ListCreateAPIView):
             return Response({"error": "You can only create a virtual card linked to your own bank account"}, status=status.HTTP_403_FORBIDDEN)
 
         virtual_card = serializer.save(user=request.user)
-        
+
         logger.info(f"Visa card number {virtual_card.card_number} created for user {request.user.full_name}")
         return Response(VirtualCardSerializer(virtual_card).data, status=status.HTTP_201_CREATED)
 
@@ -55,9 +55,7 @@ class VirtualCardDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     def get_object(self):
         obj = super().get_object()
         if obj.user != self.request.user:
-            raise PermissionDenied(
-                "You can't perform this action, because the card does not belong to you"
-            )
+            raise PermissionDenied("You can't perform this action, because the card does not belong to you")
         return obj
 
     def destroy(self, request, *args, **kwargs):
