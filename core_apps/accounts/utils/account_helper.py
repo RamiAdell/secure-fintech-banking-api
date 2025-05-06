@@ -1,5 +1,7 @@
+import random
 import secrets
 from os import getenv
+import string
 from typing import Union, List
 from django.db import transaction
 from ..emails import send_account_creation_email
@@ -33,6 +35,8 @@ def generate_account_number(currency: str) -> str:
     check_digit = calculate_luhn_check_digit(partial_account_number)
     return f"{partial_account_number}{check_digit}"
 
+def generate_otp(length=6) -> str:
+    return "".join(random.choices(string.digits, k=length))
 
 def calculate_luhn_check_digit(number: str) -> int:
     def split_into_digits(n: Union[str, int]) -> List[int]: # n can be str or int

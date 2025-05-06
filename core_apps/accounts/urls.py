@@ -3,8 +3,10 @@ from .views import (
     AccountVerificationView,
     DepositView,
     InitiateWithdrawalView,
-    VerifyUsernameAndWithdrawAPIView
-
+    VerifyUsernameAndWithdrawAPIView,
+    InitiateTransferView,
+    VerifySecurityQuestionView,
+    VerifyOTPView,
 )
 
 urlpatterns = [
@@ -12,4 +14,8 @@ urlpatterns = [
     path("deposit/", DepositView.as_view(), name="account_deposit"),
     path("initiate-withdrawal/", InitiateWithdrawalView.as_view(), name="initiate_withdrawal",),
     path("verify-username-and-withdraw/", VerifyUsernameAndWithdrawAPIView.as_view(), name="verify_username_and_withdraw",),
+    path("verify-username-and-withdraw/", VerifyUsernameAndWithdrawAPIView.as_view(), name="verify_username_and_withdraw",),
+    path("transfer/initiate/", InitiateTransferView.as_view(), name="initiate_transfer"),
+    path("transfer/verify-security-question/", VerifySecurityQuestionView.as_view(), name="verify_security_question",),
+    path("transfer/verify-otp/", VerifyOTPView.as_view(), name="verify_otp"),
     ]
