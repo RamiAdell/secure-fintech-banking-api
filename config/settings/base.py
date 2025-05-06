@@ -44,11 +44,12 @@ THIRD_PARTY_APPS = [
     'rest_framework_simplejwt.token_blacklist',
 ]
 
-LOCAL_APPS = ["core_apps.user_auth",
-              "core_apps.common",
-              "core_apps.user_profile",
-                "core_apps.accounts",
-
+LOCAL_APPS = [
+    "core_apps.user_auth",
+    "core_apps.common",
+    "core_apps.user_profile",
+    "core_apps.accounts",
+    "core_apps.cards"
 ]
 
 
