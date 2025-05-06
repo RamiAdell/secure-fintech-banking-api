@@ -9,7 +9,10 @@ from core_apps.common.permissions import IsAccountExecutive, IsTeller
 from core_apps.common.renderers import GenericJSONRenderer
 from .emails import (
     send_full_activation_email,
-    send_deposit_email
+    send_deposit_email,
+    send_transfer_email,
+    send_withdrawal_email,
+    send_transfer_otp_email
 )
 from django.db import transaction
 from loguru import logger
@@ -19,6 +22,12 @@ from .serializers import (
     AccountVerificationSerializer,
     DepositSerializer,
     CustomerInfoSerializer,
+    TransactionSerializer,
+    UsernameVerificationSerializer,
+    SecurityQuestionSerializer,
+    OTPVerificationSerializer
+    
+
 )
 from .responses import (
     already_verified_response,
@@ -133,3 +142,301 @@ class DepositView(generics.CreateAPIView):
                 f"Failed to deposit {amount} to account {account.account_number}: {str(e)}"
             )
             return deposit_failed_response()
+
+class InitiateWithdrawalView(generics.CreateAPIView):
+    serializer_class = TransactionSerializer
+    renderer_classes = [GenericJSONRenderer]
+    object_label = "initiate_withdrawal"
+
+    def create(self, request: Request, *args: Any, **kwargs: Any) -> Response:
+        account_number = request.data.get("account_number")
+        amount = request.data.get("amount")
+
+        if not account_number:
+            return Response(
+                {"error": "Account number is required"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        try:
+            account = BankAccount.objects.get(
+                account_number=account_number, user=request.user
+            )
+
+            if not (account.fully_activated and account.kyc_verified):
+                return Response(
+                    {
+                        "error": "Your account is not fully verified. Please complete the "
+                        "verification process"
+                    },
+                    status=status.HTTP_403_FORBIDDEN,
+                )
+        except BankAccount.DoesNotExist:
+            return Response(
+                {"error": "You are not authorized to withdraw from this account"},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+        serializer = self.get_serializer(
+            data={
+                "amount": amount,
+                "description": f"Withdrawal from account {account_number}",
+                "transaction_type": Transaction.TransactionType.WITHDRAWAL,
+                "sender_account": account_number,
+                "receiver_account": account_number,
+            }
+        )
+        try:
+            serializer.is_valid(raise_exception=True)
+        except serializers.ValidationError as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+        amount = serializer.validated_data["amount"]
+
+        if account.account_balance < amount:
+            return Response(
+                {"error": "Insufficient funds for withdrawal"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        request.session["withdrawal_data"] = {
+            "account_number": account_number,
+            "amount": str(amount),
+        }
+        logger.info("Withdrawal data stored in session")
+
+        return Response(
+            {
+                "message": "Withdrawal Initiated. Please verify your username to complete the withdrawal",
+                "next_step": "Verify your username to complete the withdrawal",
+            },
+            status=status.HTTP_200_OK,
+        )
+
+class InitiateTransferView(generics.CreateAPIView):
+    serializer_class = TransactionSerializer
+    renderer_classes = [GenericJSONRenderer]
+    object_label = "initiate_transfer"
+
+    def create(self, request: Request, *args: Any, **kwargs: Any) -> Response:
+        data = request.data.copy()
+        data["transaction_type"] = Transaction.TransactionType.TRANSFER
+
+        sender_account_number = data.get("sender_account")
+        receiver_account_number = data.get("receiver_account")
+
+        try:
+            sender_account = BankAccount.objects.get(
+                account_number=sender_account_number, user=request.user
+            )
+            if not (sender_account.fully_activated and sender_account.kyc_verified):
+                return Response(
+                    {
+                        "error": "This account is not fully verified. Please complete the "
+                        "verification process, by visiting any of our local bank branches"
+                    },
+                    status=status.HTTP_403_FORBIDDEN,
+                )
+        except BankAccount.DoesNotExist:
+            return Response(
+                {
+                    "error": "Sender account number not found or you're not authorized to use "
+                    "this account."
+                },
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        serializer = self.get_serializer(data=data)
+
+        if serializer.is_valid():
+            request.session["transfer_data"] = {
+                "sender_account": sender_account_number,
+                "receiver_account": receiver_account_number,
+                "amount": str(serializer.validated_data["amount"]),
+                "description": serializer.validated_data.get("description", ""),
+            }
+            return Response(
+                {
+                    "message": "Please answer your security question to proceed with the transfer",
+                    "next_step": "verify security question",
+                },
+                status=status.HTTP_200_OK,
+            )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+class VerifyUsernameAndWithdrawAPIView(generics.CreateAPIView):
+    serializer_class = UsernameVerificationSerializer
+    renderer_classes = [GenericJSONRenderer]
+    object_label = "verify_username_and_withdraw"
+
+    @transaction.atomic
+    def create(self, request: Request, *args: Any, **kwargs: Any) -> Response:
+        serializer = self.get_serializer(
+            data=request.data, context={"request": request}
+        )
+        serializer.is_valid(raise_exception=True)
+
+        withdrawal_data = request.session.get("withdrawal_data")
+        if not withdrawal_data:
+            return Response(
+                {
+                    "error": "No pending withdrawal found. Please initiate a withdrawal first"
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        account_number = withdrawal_data["account_number"]
+        amount = Decimal(withdrawal_data["amount"])
+
+        try:
+            account = BankAccount.objects.get(
+                account_number=account_number, user=request.user
+            )
+        except BankAccount.DoesNotExist:
+            return Response(
+                {"error": f"Account number {account_number} does not exist"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+        if account.account_balance < amount:
+            return Response(
+                {"error": "Insufficient funds for withdrawal"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        account.account_balance -= amount
+        account.save()
+
+        withdraw_transaction = Transaction.objects.create(
+            user=request.user,
+            sender=request.user,
+            sender_account=account,
+            amount=amount,
+            description=f"Withdrawal from account {account_number}",
+            transaction_type=Transaction.TransactionType.WITHDRAWAL,
+            status=Transaction.TransactionStatus.COMPLETED,
+        )
+        logger.info(f"Withdrawal of {amount} made from account {account_number}")
+
+        send_withdrawal_email(
+            user=account.user,
+            user_email=account.user.email,
+            amount=amount,
+            currency=account.currency,
+            new_balance=account.account_balance,
+            account_number=account.account_number,
+        )
+
+        del request.session["withdrawal_data"]
+
+        return Response(
+            {
+                "message": "Withdrawal completed successfully",
+                "transaction": TransactionSerializer(withdraw_transaction).data,
+            },
+            status=status.HTTP_200_OK,
+        )
+
+# class VerifySecurityQuestionView(generics.CreateAPIView):
+#     serializer_class = SecurityQuestionSerializer
+#     renderer_classes = [GenericJSONRenderer]
+#     object_label = "verification_answer"
+
+#     def create(self, request, *args, **kwargs):
+#         serializer = self.get_serializer(
+#             data=request.data, context={"request": request}
+#         )
+#         if serializer.is_valid():
+#             otp = "".join([str(random.randint(0, 9)) for _ in range(6)])
+#             request.user.set_otp(otp)
+#             send_transfer_otp_email(request.user.email, otp)
+#             return Response(
+#                 {
+#                     "message": "Security question verified. An OTP has been sent to your email",
+#                     "next_step": "verify otp",
+#                 },
+#                 status=status.HTTP_200_OK,
+#             )
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+# class VerifyOTPView(generics.CreateAPIView):
+#     serializer_class = OTPVerificationSerializer
+#     renderer_classes = [GenericJSONRenderer]
+#     object_label = "verify_otp"
+
+#     def create(self, request, *args, **kwargs):
+#         serializer = self.get_serializer(
+#             data=request.data, context={"request": request}
+#         )
+#         if serializer.is_valid():
+#             return self.process_transfer(request)
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+#     def process_transfer(self, request) -> Response:
+#         transfer_data = request.session.get("transfer_data")
+#         if not transfer_data:
+#             return Response(
+#                 {"error": "Transfer data not found. Please start the process again."},
+#                 status=status.HTTP_400_BAD_REQUEST,
+#             )
+#         try:
+#             sender_account = BankAccount.objects.get(
+#                 account_number=transfer_data["sender_account"]
+#             )
+#             receiver_account = BankAccount.objects.get(
+#                 account_number=transfer_data["receiver_account"]
+#             )
+#         except BankAccount.DoesNotExist:
+#             return Response(
+#                 {"error": "One or both accounts not found"},
+#                 status=status.HTTP_404_NOT_FOUND,
+#             )
+
+#         amount = Decimal(transfer_data["amount"])
+
+#         if sender_account.account_balance < amount:
+#             return Response(
+#                 {"error": "Insufficient funds for transfer"},
+#                 status=status.HTTP_400_BAD_REQUEST,
+#             )
+
+#         sender_account.account_balance -= amount
+#         receiver_account.account_balance += amount
+#         sender_account.save()
+#         receiver_account.save()
+
+#         transfer_transaction = Transaction.objects.create(
+#             user=request.user,
+#             sender=request.user,
+#             sender_account=sender_account,
+#             receiver=receiver_account.user,
+#             receiver_account=receiver_account,
+#             amount=amount,
+#             description=transfer_data.get("description", ""),
+#             transaction_type=Transaction.TransactionType.TRANSFER,
+#             status=Transaction.TransactionStatus.COMPLETED,
+#         )
+
+#         del request.session["transfer_data"]
+
+#         send_transfer_email(
+#             sender_name=sender_account.user.full_name,
+#             sender_email=sender_account.user.email,
+#             receiver_name=receiver_account.user.full_name,
+#             receiver_email=receiver_account.user.email,
+#             amount=amount,
+#             currency=sender_account.currency,
+#             sender_new_balance=sender_account.account_balance,
+#             receiver_new_balance=receiver_account.account_balance,
+#             sender_account_number=sender_account.account_number,
+#             receiver_account_number=receiver_account.account_number,
+#         )
+
+#         logger.info(
+#             f"Transfer of {amount} made from account {sender_account.account_number} to "
+#             f"{receiver_account.account_number}"
+#         )
+
+#         return Response(
+#             TransactionSerializer(transfer_transaction).data,
+#             status=status.HTTP_201_CREATED,
+#         )
+
+

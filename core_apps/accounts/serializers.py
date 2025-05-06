@@ -98,9 +98,7 @@ class TransactionSerializer(serializers.ModelSerializer):
     id = UUIDField(read_only=True)
     sender_account = serializers.CharField(max_length=20, required=False)
     receiver_account = serializers.CharField(max_length=20, required=False)
-    amount = serializers.DecimalField(
-        max_digits=10, decimal_places=2, min_value=Decimal("0.1")
-    )
+    amount = serializers.DecimalField(max_digits=10, decimal_places=2, min_value=Decimal("0.1"))
 
     class Meta:
         model = Transaction
