@@ -286,8 +286,6 @@ LOGGING = {
 CELERY_BEAT_SCHEDULE={
     "apply_daily_interest": {
         "task": "core_apps.accounts.tasks.apply_daily_interest",
-        "schedule": timedelta(seconds=1),
-        "args": (),
     },
 }
 CELERY_BROKER_URL = getenv("CELERY_BROKER_URL")
