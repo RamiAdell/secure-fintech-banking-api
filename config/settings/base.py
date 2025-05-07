@@ -287,6 +287,9 @@ CELERY_BEAT_SCHEDULE={
     "apply_daily_interest": {
         "task": "core_apps.accounts.tasks.apply_daily_interest",
     },
+    "detect_sus_activities": {
+        "task": "core_apps.accounts.tasks.detect_suspicious_activities",
+    },
 }
 CELERY_BROKER_URL = getenv("CELERY_BROKER_URL")
 CELERY_RESULT_BACKEND = getenv("CELERY_RESULT_BACKEND")

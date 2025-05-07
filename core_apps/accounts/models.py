@@ -125,8 +125,6 @@ class BankAccount(TimeStampedModel):
 
 
 
-
-
 class Transaction(TimeStampedModel):
     class TransactionStatus(models.TextChoices):
         PENDING = ("pending", _("Pending"))
