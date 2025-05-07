@@ -33,3 +33,9 @@ network-inspect:
 
 banker-db:
 	docker compose -f local.yml exec postgres psql --username=testuser --dbname=banker
+
+backup:
+	docker compose -f local.yml exec postgres backup.sh
+
+showbackups:
+	docker compose -f local.yml exec postgres backups.sh
