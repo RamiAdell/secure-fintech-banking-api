@@ -46,7 +46,7 @@ A complete **Banking & FinTech API** built with Django REST Framework and Docker
 ### 1. Clone the Repository
 
 ```bash
-   git clone https://github.com/your-username/banking-fintech-api.git
+   git clone https://github.com/RamiAdell/banking-fintech-api.git
    cd banking-fintech-api
 ```
 ### 2. Copy and configure environment variables
@@ -54,7 +54,7 @@ A complete **Banking & FinTech API** built with Django REST Framework and Docker
 ```bash
    cp .env.example .env
 ```
-Edit `.env` and fill in your secrets, DB config, email backend, etc.
+Edit `.env` and fill in  secrets, DB config, email backend, etc.
 
 ### 3. Build and run local containers
 
@@ -131,7 +131,7 @@ http://localhost:5555
 
 ## 🔐 Production Deployment
 
-1. Point your domain (e.g., `api.mybank.com`) to the server IP
+1. Point  domain (e.g., `api.mybank.com`) to the server IP
 2. Configure NGINX with SSL via Let's Encrypt
 3. Run the stack using production compose:
 
