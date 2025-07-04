@@ -27,8 +27,8 @@ A complete **Banking & FinTech API** built with Django REST Framework and Docker
 |--------------|-------------------------------------|
 | Django       | Web framework (DRF)                 |
 | DRF          | REST API backend                    |
-| Redis        | Celery broker (can use RabbitMQ too)|
-| RabbitMQ     | Optional message broker             |
+| Redis        | Celery result backend               |
+| RabbitMQ     | Celery message broker               |
 | Postgres     | Database                            |
 | Docker       | Containerization                    |
 | NGINX        | Reverse proxy and static serving    |
